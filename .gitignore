@@ -3,6 +3,7 @@ myenv/
 .venv/
 venv/
 env/
+.python-version
 
 # Python cache
 __pycache__/
