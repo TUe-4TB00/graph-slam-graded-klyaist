@@ -95,7 +95,8 @@ def minimize_errors(graph, initial_estimate, pose_options):
             candidate_errors = []
             for pose_idx in [1, 2, 3]:
                 pose_error = 0.0
-                for factor in trial_graph:
+                for i in range(trial_graph.size()):
+                    factor = trial_graph[i]
                     if X(pose_idx) in factor.keys():
                         pose_error += factor.error(result)
                 candidate_errors.append(pose_error)
