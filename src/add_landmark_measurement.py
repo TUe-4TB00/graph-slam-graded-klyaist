@@ -20,5 +20,5 @@ def add_landmark_measurement(graph, initial_estimate, result):
 
     rotation = math.atan2(dy, dx) - X4.theta()
 
-    graph.add(gtsam.BearingRangeFactor2D(X(4), L(2), gtsam.Rot2.fromRadians(rotation), distance, MEASUREMENT_NOISE))
+    graph.add(gtsam.BearingRangeFactor2D(X(4), L(2), gtsam.Rot2.fromDegrees(rotation), distance, MEASUREMENT_NOISE))
     return graph
