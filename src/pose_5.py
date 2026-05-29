@@ -56,8 +56,8 @@ def minimize_marginals(graph, initial_estimate, pose_options):
 
     for pose_name, pose_5 in pose_options.items():
         for landmark in [1, 2]:
-            trial_graph = graph
-            trial_estimate = initial_estimate
+            trial_graph = graph.clone()
+            trial_estimate = gtsam.Values(initial_estimate)
             trial_graph, trial_estimate = add_pose(trial_graph, trial_estimate, pose_5)
             result = optimize(trial_graph, trial_estimate)
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
