@@ -75,7 +75,7 @@ def minimize_marginals(graph, initial_estimate, pose_options):
                 best_landmark = landmark
                 best_total = total
 
-    return best_pose, best_landmark, sum_of_marginals
+    return best_pose, best_landmark, best_total
 
 def minimize_errors(graph, initial_estimate, pose_options):
     #TODO: try different pose and landmark options here, and keep the one with the lowest resulting error.
