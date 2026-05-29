@@ -13,8 +13,8 @@ def add_landmark_measurement(graph, initial_estimate, result):
     X4 = result.atPose2(X(4))
     L2 = result.atPoint2(L(2))
 
-    dx = L2.x() - X4.x()
-    dy = L2.y() - X4.y()
+    dx = L2[0] - X4.x()
+    dy = L2[1] - X4.y()
 
     distance = math.hypot(dx, dy)
 
