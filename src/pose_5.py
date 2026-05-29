@@ -78,10 +78,10 @@ def minimize_marginals(graph, initial_estimate, pose_options):
     return best_pose, best_landmark, best_total
 
 def minimize_errors(graph, initial_estimate, pose_options):
-    
-    sum_of_errors = float("inf")
+    best_error = float('inf')
     best_pose = None
     best_landmark = None
+    list_of_errors = []
 
     for pose_name, pose_5 in pose_options.items():
         for landmark in [1, 2]:
@@ -92,19 +92,14 @@ def minimize_errors(graph, initial_estimate, pose_options):
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
             result = optimize(trial_graph, trial_estimate)
 
-            list_of_errors = []
-            for pose_idx in [1, 2, 3]:
-                pose_error = 0.0
-                for factor in trial_graph:
-                    if X(pose_idx) in factor.keys():
-                        pose_error += factor.error(result)
-                list_of_errors.append(pose_error)
-            
-            total = sum(list_of_errors)
+            candidate_error = trial_graph.error(result)
+            list_of_errors.append(candidate_error)
 
-            if total < sum_of_errors:
-                sum_of_errors = total
+            if candidate_error < best_error:
+                best_error = candidate_error
                 best_pose = pose_name
                 best_landmark = landmark
+
+    sum_of_errors = sum(list_of_errors)
 
     return best_pose, best_landmark, sum_of_errors
