@@ -2,7 +2,6 @@ import numpy as np
 from helperfunctions import add_pose_from_global, add_landmark_measurement_from_global
 import gtsam
 from gtsam.symbol_shorthand import L, X
-import copy
 
 PRIOR_NOISE = gtsam.noiseModel.Diagonal.Sigmas(np.array([0.1, 0.1, 0.05]))  # (x, y, theta)
 ODOMETRY_NOISE = gtsam.noiseModel.Diagonal.Sigmas(np.array([0.2, 0.2, 0.1]))  # (dx, dy, dtheta)
@@ -53,25 +52,28 @@ def minimize_marginals(graph, initial_estimate, pose_options):
     sum_of_marginals = float("inf")
     best_pose = None
     best_landmark = None
+    best_total = None
 
     for pose_name, pose_5 in pose_options.items():
         for landmark in [1, 2]:
-            trial_graph = copy.deepcopy(graph)
-            trial_estimate = copy.deepcopy(initial_estimate)
+            trial_graph = graph
+            trial_estimate = initial_estimate
             trial_graph, trial_estimate = add_pose(trial_graph, trial_estimate, pose_5)
             result = optimize(trial_graph, trial_estimate)
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
-            result = optimize(trial_graph, result)
+            result = optimize(trial_graph, trial_estimate)
 
             marginals = gtsam.Marginals(trial_graph, result)
-            score = 0.0
-            for landmark_id in [1, 2]:
-                score += marginals.marginalCovariance(L(landmark_id)).sum()
+
+            score = np.trace(marginals.marginalCovariance(L(landmark)))
+
+            total = marginals.marginalCovariance(L(1)).sum() + marginals.marginalCovariance(L(2)).sum()
 
             if score < sum_of_marginals:
                 sum_of_marginals = score
                 best_pose = pose_name
                 best_landmark = landmark
+                best_total = total
 
     return best_pose, best_landmark, sum_of_marginals
 
