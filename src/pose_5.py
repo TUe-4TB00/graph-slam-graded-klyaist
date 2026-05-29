@@ -61,7 +61,7 @@ def minimize_marginals(graph, initial_estimate, pose_options):
             trial_graph, trial_estimate = add_pose(trial_graph, trial_estimate, pose_5)
             result = optimize(trial_graph, trial_estimate)
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
-            result = optimize(trial_graph, trial_estimate)
+            result = optimize(trial_graph, result)
 
             marginals = gtsam.Marginals(trial_graph, result)
             score = marginals.marginalCovariance(L(landmark)).sum()
