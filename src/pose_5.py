@@ -92,11 +92,19 @@ def minimize_errors(graph, initial_estimate, pose_options):
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
             result = optimize(trial_graph, trial_estimate)
 
-            candidate_error = trial_graph.error(result)
-            list_of_errors.append(candidate_error)
+            candidate_errors = []
+            for pose_idx in [1, 2, 3]:
+                pose_error = 0.0
+                for factor in trial_graph:
+                    if X(pose_idx) in factor.keys():
+                        pose_error += factor.error(result)
+                candidate_errors.append(pose_error)
+            
+            total = sum(candidate_errors)
+            list_of_errors.append(total)
 
-            if candidate_error < best_error:
-                best_error = candidate_error
+            if total < best_error:
+                best_error = total
                 best_pose = pose_name
                 best_landmark = landmark
 
