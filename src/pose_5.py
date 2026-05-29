@@ -81,34 +81,23 @@ def minimize_errors(graph, initial_estimate, pose_options):
     best_error = float('inf')
     best_pose = None
     best_landmark = None
-    list_of_errors = []
 
     for pose_name, pose_5 in pose_options.items():
         for landmark in [1, 2]:
             trial_graph = graph.clone()
             trial_estimate = gtsam.Values(initial_estimate)
+            
             trial_graph, trial_estimate = add_pose(trial_graph, trial_estimate, pose_5)
             result = optimize(trial_graph, trial_estimate)
+            
             trial_graph = add_landmark_measurement(trial_graph, result, pose_5, landmark)
             result = optimize(trial_graph, trial_estimate)
 
-            candidate_errors = []
-            for pose_idx in [1, 2, 3]:
-                pose_error = 0.0
-                for i in range(trial_graph.size()):
-                    factor = trial_graph.at(i)
-                    if X(pose_idx) in factor.keys():
-                        pose_error += factor.error(result)
-                candidate_errors.append(pose_error)
-            
-            total = sum(candidate_errors)
-            list_of_errors.append(total)
+            total = trial_graph.error(result)
 
             if total < best_error:
                 best_error = total
                 best_pose = pose_name
                 best_landmark = landmark
 
-    sum_of_errors = sum(list_of_errors)
-
-    return best_pose, best_landmark, sum_of_errors
+    return best_pose, best_landmark, best_error
